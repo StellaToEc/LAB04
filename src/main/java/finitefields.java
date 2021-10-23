@@ -1,6 +1,7 @@
 import java.util.Scanner;
 
 public class finitefields{
+    static String mx = "1000011";
 
     static double findNum(String str){
 
@@ -40,6 +41,93 @@ public class finitefields{
         return Integer.toHexString(r);
     }
 
+    public static int polynomialMultiplication(String fx, String gx)
+    {
+        int maskFx = (int)Math.pow(2, fx.length()) - 1;
+        int maskGx = (int)Math.pow(2, gx.length()) - 1;
+        int fxNum = Integer.parseInt(fx, 2);
+        int gxNum = Integer.parseInt(gx, 2);
+        int mxDegree = mx.length() - 1;
+        int result;
+
+        if(fx.length() > mx.length() || gx.length() > mx.length())
+        {
+            System.out.println("There has been an error, one of the polynomials degree is greater");
+            return 0;
+        }
+
+        /** f(x) equals zero, it is calculated g(x) mod m(x) */
+        if((fxNum & maskFx) == 1)
+        {
+            System.out.println("The polynomial f(x) is equal one");
+            result = singlePolynomialMultiplication(gxNum, mxDegree);
+            return result;
+        }
+        /** g(x) equals zero, it is calculated f(x) mod m(x) */
+        else if((gxNum & maskGx) == 1)
+        {
+            System.out.println("The polynomial g(x) is equal one");
+            result = singlePolynomialMultiplication(fxNum, mxDegree);
+            return result;
+            /*
+            System.out.println("The result expressed as a number: " + result);
+            System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
+            */
+        }
+
+        int aux = 0, position;
+        result = 0;
+        for(int i = mxDegree - 1; i >= 0; i--)
+        {
+            position =  1 << i;
+            if(gxNum >= position)
+            {
+                gxNum = gxNum - position;
+                aux = fxNum;
+
+                for(int j = i; j > 0; j--)
+                    aux = singlePolynomialMultiplication(aux, mxDegree);
+                result = result ^ aux;
+            }
+        }
+
+        return result;
+        /*
+        System.out.println("The result expressed as a number: " + result);
+        System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
+        */
+    }
+
+    /**
+     * n extracted from GF(2^n)
+     * @param polynomial
+     * @param n
+     * @return
+     */
+    public static int singlePolynomialMultiplication(int polynomial, int n)
+    {
+        int maxDegree = 1 << n - 1;
+        if(polynomial < maxDegree)
+            return (polynomial << 1);
+
+        else if(polynomial >= maxDegree)
+        {
+            /**
+             * Since the degree of the polynomial is greater than the maximum degree
+             * of GF it is substracted the MSB on the polynomial
+             */
+            polynomial = polynomial - maxDegree;
+            /**
+             * Since the irreducible polynomial considered is x^6 + x + 1
+             * so the remainder will be (x + 1) <=> 3
+             */
+            int maskMx = (int) Math.pow(2, mx.length() - 1) - 1;
+            System.out.println("Remainder of m(x): " + (Integer.parseInt(mx, 2) & maskMx));
+            return (polynomial << 1) ^ (Integer.parseInt(mx, 2) & maskMx);
+        }
+
+        return 0;
+    }
     /*public void table(){
 
     }
@@ -61,6 +149,11 @@ public class finitefields{
         gx = reader.nextLine();
 
         System.out.println("RESULTADO:"+multi(mx,fx,gx));
+
+        int result = polynomialMultiplication(fx, gx);
+
+        System.out.println("The result expressed as a number: " + result);
+        System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
     }
 }
 

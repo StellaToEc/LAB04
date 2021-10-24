@@ -128,6 +128,32 @@ public class finitefields{
 
         return 0;
     }
+
+    static int[][] findTable(int n)
+    {
+        /**
+         * MASKS
+         * 15 <=> 0000 1111
+         * 240 <=> 1111 0000
+         */
+        int columns = (int)(Math.pow(2, n) - 1) & 15;
+        int rows = ((int)(Math.pow(2, n) - 1) & 240) >> 4;
+        int [][]table  = new int[rows + 1][columns + 1];
+        System.out.println("Cols: " + Integer.toHexString(columns));
+        System.out.println("Rows: " + Integer.toHexString(rows));
+
+        for(int row = 0; row <= rows; row++)
+        {
+            for(int col = 0; col <= columns; col++)
+            {
+                table[row][col] = col | (row << 4);
+                System.out.print(Integer.toHexString(table[row][col]) + "\t");
+            }
+            System.out.println();
+        }
+
+        return table;
+    }
     /*public void table(){
 
     }

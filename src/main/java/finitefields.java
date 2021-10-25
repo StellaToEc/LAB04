@@ -1,10 +1,22 @@
 import java.util.Scanner;
 
-public class finitefields{
+/**
+ * Lab. 4: Finite Fields
+ * Cryptography. 3CM15
+ * @professor Sandra Díaz Santiago
+ * @author Castillo Rodrígurez David Israel
+ * @author Madrigal Buendia David
+ * @author Toledo Espinosa Cristina Aline
+ * @date October 2021
+ */
+
+public class finitefields
+{
+    /** Polynomial m(x) = x*6 + x + 1 */
     static String mx = "1000011";
 
-    static double findNum(String str){
-
+    static double findNum(String str)
+    {
         double num=0;
 
         for(int i= str.length(); i>0 ; i--)
@@ -41,6 +53,15 @@ public class finitefields{
         return Integer.toHexString(r);
     }
 
+    /**
+     * This method takes two polynomials expressed as a binary string
+     * (i.e. 101010, 000010) and it returns an integer which is equal
+     * to the result of the multiplication of the two polynomials
+     * expressed as an integer value
+     * @param fx
+     * @param gx
+     * @return
+     */
     public static int polynomialMultiplication(String fx, String gx)
     {
         int maskFx = (int)Math.pow(2, fx.length()) - 1;
@@ -59,20 +80,14 @@ public class finitefields{
         /** f(x) equals zero, it is calculated g(x) mod m(x) */
         if((fxNum & maskFx) == 1)
         {
-            System.out.println("The polynomial f(x) is equal one");
             result = singlePolynomialMultiplication(gxNum, mxDegree);
             return result;
         }
         /** g(x) equals zero, it is calculated f(x) mod m(x) */
         else if((gxNum & maskGx) == 1)
         {
-            System.out.println("The polynomial g(x) is equal one");
             result = singlePolynomialMultiplication(fxNum, mxDegree);
             return result;
-            /*
-            System.out.println("The result expressed as a number: " + result);
-            System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
-            */
         }
 
         int aux = 0, position;
@@ -92,13 +107,12 @@ public class finitefields{
         }
 
         return result;
-        /*
-        System.out.println("The result expressed as a number: " + result);
-        System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
-        */
     }
 
     /**
+     * Implementation of the reviewed algorithm during the class time
+     * If the degree of the polynomial is less than (n - 1) an array shift
+     * is made, else an array shift is made and a XOR operation are made
      * n extracted from GF(2^n)
      * @param polynomial
      * @param n
@@ -122,13 +136,18 @@ public class finitefields{
              * so the remainder will be (x + 1) <=> 3
              */
             int maskMx = (int) Math.pow(2, mx.length() - 1) - 1;
-            System.out.println("Remainder of m(x): " + (Integer.parseInt(mx, 2) & maskMx));
             return (polynomial << 1) ^ (Integer.parseInt(mx, 2) & maskMx);
         }
 
         return 0;
     }
 
+    /**
+     * According to the degree of the irreducible polynomial both of the rows
+     * and columns are calculated and the table is made
+     * @param n
+     * @return
+     */
     static int[][] findTable(int n)
     {
         /**
@@ -153,6 +172,56 @@ public class finitefields{
         }
 
         return table;
+    }
+
+    /**
+     * By using a previously calculated table and the degree 'n'
+     * of the irreducible polynomial, the multiplicative inverse
+     * for each element of the table is calculated by using a previous
+     * function 'polynomialMultiplication'
+     * @param n
+     * @param multTable
+     * @return
+     */
+    static int[][] multiplicativeInverse(int n, int[][] multTable)
+    {
+        int columns = (int)(Math.pow(2, n) - 1) & 15;
+        int rows = ((int)(Math.pow(2, n) - 1) & 240) >> 4;
+        int [][]table  = new int[rows + 1][columns + 1];
+        System.out.println("Cols: " + Integer.toHexString(columns));
+        System.out.println("Rows: " + Integer.toHexString(rows));
+
+        int aux, result;
+        for(int row = 0; row <= rows; row++)
+        {
+            for(int col = 0; col <= columns; col++)
+            {
+                aux = multTable[row][col];
+                for(int innerRow = 0; innerRow <= rows; innerRow++)
+                {
+                    for(int innerCol = 0; innerCol <= columns; innerCol++)
+                    {
+                        result = polynomialMultiplication(Integer.toBinaryString(aux), Integer.toBinaryString(multTable[innerRow][innerCol]));
+                        if(result == 1)
+                        {
+                            //System.out.println("The inverse for " + Integer.toHexString(multTable[row][col]) + " is " + Integer.toHexString(multTable[innerRow][innerCol]));
+                            table[row][col] = multTable[innerRow][innerCol];
+                            //break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for(int row = 0; row <= rows; row++)
+        {
+            for(int col = 0; col <= columns; col++)
+            {
+                System.out.print(Integer.toHexString(table[row][col]) + "\t");
+            }
+            System.out.println();
+        }
+        return null;
     }
     /*public void table(){
 
@@ -180,6 +249,10 @@ public class finitefields{
 
         System.out.println("The result expressed as a number: " + result);
         System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
+
+        /** Multiplication and its multiplicative inverse */
+        int [][]table = findTable(6);
+        int [][]inverse = multiplicativeInverse(6, table);
     }
 }
 

@@ -42,13 +42,18 @@ public class finitefields{
                 for (int j = 0; j < k-i; j++) {
                     if (m + j +1< n)
                         mult = mult << 1;
-                    else
-                        mult = (mult << 1) ^ (int)findNum(mx);
+                    else{
+			mult = mult<<1 ^ (int)findNum(mx);
+			}
                 }
                 r = (r ^ mult);
+		if( (r ^ (int)Math.pow(2,n)) == r)
+			r = r;
+		else
+			r = (r ^ (int)findNum(mx));
             }
         }
-        return Integer.toHexString(r);
+      return Integer.toHexString(r);
     }
 
     /**
@@ -221,11 +226,8 @@ public class finitefields{
         return table;
     }
     /*public void table(){
-
     }
-
     public void searchInv(){
-
     }*/
 
     public static void main (String[]args){
@@ -233,14 +235,14 @@ public class finitefields{
 
         Scanner reader = new Scanner(System.in);
 
-        System.out.println("Please give de m(x)");
+        System.out.println("Please give the m(x)");
         mx = reader.nextLine();
         System.out.println("Please give the first polynomial f(x)");
         fx = reader.nextLine();
         System.out.println("Please give the second polynomial g(x)");
         gx = reader.nextLine();
 
-        System.out.println("RESULTADO:"+multi(mx,fx,gx));
+        System.out.println("Result: 0x"+multi(mx,fx,gx));
 
         int result = polynomialMultiplication(fx, gx);
 
@@ -251,4 +253,3 @@ public class finitefields{
         int [][]inverse = multiplicativeInverse(6, table);
     }
 }
-

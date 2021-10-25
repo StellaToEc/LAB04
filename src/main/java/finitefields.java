@@ -1,27 +1,42 @@
+/*
+ * Lab 4: Finite Fields
+ * Implement of irreducible polynomial
+ * Implement multiplicative polinomial (using bits)
+ */
 import java.util.Scanner;
 
+/**
+ *
+ * @author Cristina Aline Toledo Espinosa
+ * @author David Madrigal Buendía
+ * @author David Israel Castillo Rodriguez
+ */
 public class finitefields{
+    // mx is our irreducible polynomial in binary
     static String mx = "1000011";
 
+    /**
+     * This method converts a string binary to number
+     * @param str Is a string with binary data
+     * @return The equivalent in decimal format
+     */
     static double findNum(String str){
-
         double num=0;
 
         for(int i= str.length(); i>0 ; i--)
             if(str.charAt(i-1)=='1')
                 num += Math.pow(2,str.length()-i);
-
         return num;
     }
 
     static String multi(String mx, String fx, String gx){
-        int n = mx.length()-1;
-        int m = fx.length()-1;
-        int k = gx.length()-1;
+        int n = mx.length()-1; // n, mx's bits - GF
+        int m = fx.length()-1; // m, fx's bits
+        int k = gx.length()-1; // k, gx's bits
 
-        int r,mult;
+        int r, mult;
 
-        if( gx.charAt(k)== '1')
+        if(gx.charAt(k)== '1')
             r = (int)findNum(fx);
         else
             r = 0x00;
@@ -41,6 +56,12 @@ public class finitefields{
         return Integer.toHexString(r);
     }
 
+    /**
+     * This method multiply two functions in GF(2^n) (Galois Field)
+     * @param fx Is the first function in string with binary data
+     * @param gx Is the second function in string with binary data
+     * @return 
+     */
     public static int polynomialMultiplication(String fx, String gx)
     {
         int maskFx = (int)Math.pow(2, fx.length()) - 1;
@@ -163,18 +184,18 @@ public class finitefields{
     }*/
 
     public static void main (String[]args){
-        String mx,gx,fx;
+        String mx, gx, fx;
 
         Scanner reader = new Scanner(System.in);
 
-        System.out.println("Please give de m(x)");
+        System.out.println("Please give de m(x) in binary format: ");
         mx = reader.nextLine();
-        System.out.println("Please give the first polynomial f(x)");
+        System.out.println("Please give the first polynomial f(x) in binary format: ");
         fx = reader.nextLine();
-        System.out.println("Please give the second polynomial g(x)");
+        System.out.println("Please give the second polynomial g(x) in binary format: ");
         gx = reader.nextLine();
 
-        System.out.println("RESULTADO:"+multi(mx,fx,gx));
+        System.out.println("Result: " + multi(mx,fx,gx));
 
         int result = polynomialMultiplication(fx, gx);
 
@@ -182,4 +203,3 @@ public class finitefields{
         System.out.println("The result expressed as a binary string: " + Integer.toBinaryString(result));
     }
 }
-
